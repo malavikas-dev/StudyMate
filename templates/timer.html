@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Study Timer | StudyMate
+{% endblock %}
+
+
+{% block page_title %}
+Study Timer ⏱️
+{% endblock %}
+
+
+{% block page_subtitle %}
+Focus on your studies and track your time.
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="timer-page">
+
+
+    <div class="timer-card">
+
+
+        <div class="timer-icon">
+
+            <i class="bi bi-stopwatch-fill"></i>
+
+        </div>
+
+
+        <h2>
+            Focus Session
+        </h2>
+
+
+        <p class="timer-description">
+            Choose a subject and start your study session.
+        </p>
+
+
+        <!-- Subject -->
+
+        <div class="timer-select">
+
+            <label for="subject">
+
+                Study Subject
+
+            </label>
+
+
+            <select id="subject">
+
+                <option value="">
+
+                    Select a subject
+
+                </option>
+
+
+                {% for subject in subjects %}
+
+                <option value="{{ subject.id }}">
+
+                    {{ subject.name }}
+
+                </option>
+
+                {% endfor %}
+
+
+            </select>
+
+        </div>
+
+
+        <!-- Timer -->
+
+        <div
+            id="timer-display"
+            class="timer-display"
+        >
+            00:00:00
+        </div>
+
+
+        <!-- Controls -->
+
+        <div class="timer-controls">
+
+            <button
+                id="start-btn"
+                class="timer-start"
+            >
+
+                <i class="bi bi-play-fill"></i>
+
+                Start
+
+            </button>
+
+
+            <button
+                id="pause-btn"
+                class="timer-pause"
+                disabled
+            >
+
+                <i class="bi bi-pause-fill"></i>
+
+                Pause
+
+            </button>
+
+
+            <button
+                id="stop-btn"
+                class="timer-stop"
+                disabled
+            >
+
+                <i class="bi bi-stop-fill"></i>
+
+                Stop
+
+            </button>
+
+        </div>
+
+
+        <p
+            id="timer-message"
+            class="timer-message"
+        ></p>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+let seconds = 0;
+
+let timerInterval = null;
+
+let isRunning = false;
+
+
+const display =
+    document.getElementById("timer-display");
+
+const subject =
+    document.getElementById("subject");
+
+const startBtn =
+    document.getElementById("start-btn");
+
+const pauseBtn =
+    document.getElementById("pause-btn");
+
+const stopBtn =
+    document.getElementById("stop-btn");
+
+const message =
+    document.getElementById("timer-message");
+
+
+// ==========================================
+// FORMAT TIME
+// ==========================================
+
+function formatTime(totalSeconds) {
+
+    const hours =
+        Math.floor(totalSeconds / 3600);
+
+    const minutes =
+        Math.floor(
+            (totalSeconds % 3600) / 60
+        );
+
+    const secs =
+        totalSeconds % 60;
+
+
+    return [
+
+        String(hours).padStart(2, "0"),
+
+        String(minutes).padStart(2, "0"),
+
+        String(secs).padStart(2, "0")
+
+    ].join(":");
+}
+
+
+// ==========================================
+// UPDATE DISPLAY
+// ==========================================
+
+function updateDisplay() {
+
+    display.textContent =
+        formatTime(seconds);
+}
+
+
+// ==========================================
+// START
+// ==========================================
+
+startBtn.addEventListener(
+    "click",
+    function() {
+
+        if (!subject.value) {
+
+            message.textContent =
+                "Please select a subject first.";
+
+            return;
+        }
+
+
+        message.textContent =
+            "Study session in progress... 📚";
+
+
+        if (!isRunning) {
+
+            isRunning = true;
+
+
+            timerInterval =
+                setInterval(
+                    function() {
+
+                        seconds++;
+
+                        updateDisplay();
+
+                    },
+                    1000
+                );
+
+
+            startBtn.disabled = true;
+
+            pauseBtn.disabled = false;
+
+            stopBtn.disabled = false;
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// PAUSE
+// ==========================================
+
+pauseBtn.addEventListener(
+    "click",
+    function() {
+
+        if (isRunning) {
+
+            clearInterval(timerInterval);
+
+            isRunning = false;
+
+            pauseBtn.innerHTML =
+                '<i class="bi bi-play-fill"></i> Resume';
+
+            message.textContent =
+                "Session paused.";
+
+        } else {
+
+            isRunning = true;
+
+            timerInterval =
+                setInterval(
+                    function() {
+
+                        seconds++;
+
+                        updateDisplay();
+
+                    },
+                    1000
+                );
+
+            pauseBtn.innerHTML =
+                '<i class="bi bi-pause-fill"></i> Pause';
+
+            message.textContent =
+                "Study session resumed... 📚";
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// STOP
+// ==========================================
+
+stopBtn.addEventListener(
+    "click",
+    function() {
+
+        clearInterval(timerInterval);
+
+        isRunning = false;
+
+
+        if (seconds <= 0) {
+
+            return;
+        }
+
+
+        const hours =
+            seconds / 3600;
+
+
+        const form =
+            document.createElement("form");
+
+        form.method = "POST";
+
+        form.action =
+            "{{ url_for('save_session') }}";
+
+
+        const subjectInput =
+            document.createElement("input");
+
+        subjectInput.type = "hidden";
+
+        subjectInput.name = "subject_id";
+
+        subjectInput.value =
+            subject.value;
+
+
+        const durationInput =
+            document.createElement("input");
+
+        durationInput.type = "hidden";
+
+        durationInput.name = "duration";
+
+        durationInput.value =
+            hours;
+
+
+        form.appendChild(subjectInput);
+
+        form.appendChild(durationInput);
+
+        document.body.appendChild(form);
+
+        form.submit();
+
+    }
+);
+
+</script>
+
+
+{% endblock %}

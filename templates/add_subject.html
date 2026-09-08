@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Subject | StudyMate
+{% endblock %}
+
+{% block page_title %}
+Add Subject
+{% endblock %}
+
+{% block page_subtitle %}
+Add a subject to your study planner.
+{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+
+    <div class="form-card">
+
+        <div class="form-header">
+
+            <div class="form-icon pink">
+                <i class="bi bi-book-fill"></i>
+            </div>
+
+            <div>
+
+                <h2>
+                    New Subject
+                </h2>
+
+                <p>
+                    Enter the details of your subject.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <form method="POST">
+
+
+            <!-- Subject Name -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Subject Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Data Structures"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Difficulty -->
+
+            <div class="form-group">
+
+                <label for="difficulty">
+                    Difficulty
+                </label>
+
+                <select
+                    id="difficulty"
+                    name="difficulty"
+                    required
+                >
+
+                    <option value="">
+                        Select difficulty
+                    </option>
+
+                    <option value="Easy">
+                        Easy
+                    </option>
+
+                    <option value="Medium">
+                        Medium
+                    </option>
+
+                    <option value="Hard">
+                        Hard
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Exam Date -->
+
+            <div class="form-group">
+
+                <label for="exam_date">
+                    Exam Date
+                </label>
+
+                <input
+                    type="date"
+                    id="exam_date"
+                    name="exam_date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Target Hours -->
+
+            <div class="form-group">
+
+                <label for="target_hours">
+                    Target Study Hours
+                </label>
+
+                <input
+                    type="number"
+                    id="target_hours"
+                    name="target_hours"
+                    min="1"
+                    step="0.5"
+                    placeholder="e.g. 15"
+                    required
+                >
+
+                <small>
+                    Estimated total hours you want to spend on this subject.
+                </small>
+
+            </div>
+
+
+            <!-- Buttons -->
+
+            <div class="form-buttons">
+
+                <a
+                    href="{{ url_for('subjects') }}"
+                    class="btn-cancel"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Save Subject
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

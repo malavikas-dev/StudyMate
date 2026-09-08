@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Tasks | StudyMate
+{% endblock %}
+
+
+{% block page_title %}
+Tasks
+{% endblock %}
+
+
+{% block page_subtitle %}
+Organize your study work and stay on track.
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-actions">
+
+    <div>
+
+        <h2 class="section-title">
+            Your Tasks
+        </h2>
+
+        <p class="section-subtitle">
+            Complete your tasks and keep your study progress moving.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('add_task') }}"
+        class="btn btn-primary"
+    >
+
+        <i class="bi bi-plus-lg"></i>
+
+        Add Task
+
+    </a>
+
+</div>
+
+
+
+{% if tasks %}
+
+
+<div class="task-list">
+
+
+    {% for task in tasks %}
+
+
+    <div class="task-card
+        {% if task.status == 'Completed' %}
+            task-completed
+        {% endif %}
+    ">
+
+
+        <div class="task-check">
+
+            {% if task.status == "Completed" %}
+
+                <i class="bi bi-check-circle-fill"></i>
+
+            {% else %}
+
+                <i class="bi bi-circle"></i>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="task-main">
+
+            <div class="task-title-row">
+
+                <h3>
+                    {{ task.title }}
+                </h3>
+
+
+                {% if task.status == "Completed" %}
+
+                    <span class="task-status completed">
+                        Completed
+                    </span>
+
+                {% else %}
+
+                    <span class="task-status pending">
+                        Pending
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <p class="task-description">
+
+                {% if task.description %}
+
+                    {{ task.description }}
+
+                {% else %}
+
+                    No description added.
+
+                {% endif %}
+
+            </p>
+
+
+            <div class="task-meta">
+
+
+                <span>
+
+                    <i class="bi bi-book"></i>
+
+                    {{ task.subject_name }}
+
+                </span>
+
+
+                <span>
+
+                    <i class="bi bi-calendar3"></i>
+
+                    {{ task.due_date }}
+
+                </span>
+
+
+                <span>
+
+                    <i class="bi bi-clock"></i>
+
+                    {{ task.estimated_hours }} hrs
+
+                </span>
+
+
+            </div>
+
+        </div>
+
+
+        <div class="task-actions">
+
+
+            {% if task.status != "Completed" %}
+
+                <a
+                    href="{{ url_for('complete_task', task_id=task.id) }}"
+                    class="task-complete-btn"
+                    title="Mark as completed"
+                >
+
+                    <i class="bi bi-check-lg"></i>
+
+                </a>
+
+            {% endif %}
+
+
+            <a
+                href="{{ url_for('delete_task', task_id=task.id) }}"
+                class="task-delete-btn"
+                title="Delete task"
+                onclick="return confirm('Delete this task?');"
+            >
+
+                <i class="bi bi-trash"></i>
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+    {% endfor %}
+
+
+</div>
+
+
+{% else %}
+
+
+<div class="empty-page">
+
+
+    <div class="empty-page-icon">
+
+        <i class="bi bi-check2-square"></i>
+
+    </div>
+
+
+    <h3>
+        No tasks yet
+    </h3>
+
+
+    <p>
+        Add your first study task and start getting things done.
+    </p>
+
+
+    <a
+        href="{{ url_for('add_task') }}"
+        class="btn btn-primary"
+    >
+
+        <i class="bi bi-plus-lg"></i>
+
+        Add Your First Task
+
+    </a>
+
+
+</div>
+
+
+{% endif %}
+
+
+{% endblock %}

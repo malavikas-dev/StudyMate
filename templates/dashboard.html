@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | StudyMate
+{% endblock %}
+
+{% block page_title %}
+Good to see you! 👋
+{% endblock %}
+
+{% block page_subtitle %}
+Here's your study overview for today.
+{% endblock %}
+
+{% block content %}
+
+<!-- ======================================
+     STAT CARDS
+====================================== -->
+
+<div class="stats-grid">
+
+    <!-- Total Subjects -->
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            <i class="bi bi-book-fill"></i>
+        </div>
+
+        <div>
+            <span>Total Subjects</span>
+            <h2>{{ total_subjects }}</h2>
+        </div>
+
+    </div>
+
+
+    <!-- Pending Tasks -->
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            <i class="bi bi-list-check"></i>
+        </div>
+
+        <div>
+            <span>Pending Tasks</span>
+            <h2>{{ pending_tasks }}</h2>
+        </div>
+
+    </div>
+
+
+    <!-- Completed Tasks -->
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+
+        <div>
+            <span>Completed Tasks</span>
+            <h2>{{ completed_tasks }}</h2>
+        </div>
+
+    </div>
+
+
+    <!-- Study Hours -->
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            <i class="bi bi-clock-fill"></i>
+        </div>
+
+        <div>
+            <span>Study Hours</span>
+            <h2>{{ "%.2f"|format(study_hours) }}</h2>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================
+     TASKS + EXAMS
+====================================== -->
+
+<div class="two-column">
+
+
+    <!-- ==================================
+         UPCOMING TASKS
+    =================================== -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <div>
+                <h3>Upcoming Tasks</h3>
+
+                <p>
+                    Stay on top of your study work.
+                </p>
+            </div>
+
+            <a
+                href="{{ url_for('add_task') }}"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-plus-lg"></i>
+                Add Task
+            </a>
+
+        </div>
+
+
+        {% if upcoming_tasks %}
+
+        <div class="task-list">
+
+            {% for task in upcoming_tasks %}
+
+            <div class="task-item">
+
+                <div class="task-checkbox">
+
+                    <i class="bi bi-circle"></i>
+
+                </div>
+
+
+                <div class="task-info">
+
+                    <strong>
+                        {{ task.title }}
+                    </strong>
+
+                    <span>
+                        {{ task.subject_name }}
+                        ·
+                        Due {{ task.due_date }}
+                    </span>
+
+                </div>
+
+
+                <span class="badge badge-pink">
+                    {{ task.estimated_hours }}h
+                </span>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-page">
+
+            <div class="empty-page-icon">
+                <i class="bi bi-check2-circle"></i>
+            </div>
+
+            <h3>
+                All caught up! 🎉
+            </h3>
+
+            <p>
+                You don't have any pending tasks.
+            </p>
+
+            <a
+                href="{{ url_for('add_task') }}"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-plus-lg"></i>
+                Add Task
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+
+    <!-- ==================================
+         UPCOMING EXAMS
+    =================================== -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <div>
+                <h3>Upcoming Exams</h3>
+
+                <p>
+                    Keep your exam dates in sight.
+                </p>
+            </div>
+
+            <a
+                href="{{ url_for('subjects') }}"
+                class="btn btn-outline"
+            >
+                View Subjects
+            </a>
+
+        </div>
+
+
+        {% if upcoming_exams %}
+
+        <div class="task-list">
+
+            {% for exam in upcoming_exams %}
+
+            <div class="task-item">
+
+                <div class="task-checkbox">
+
+                    <i class="bi bi-calendar-event"></i>
+
+                </div>
+
+
+                <div class="task-info">
+
+                    <strong>
+                        {{ exam.name }}
+                    </strong>
+
+                    <span>
+                        {{ exam.difficulty }} difficulty
+                    </span>
+
+                </div>
+
+
+                <span class="badge badge-pink">
+                    {{ exam.exam_date }}
+                </span>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-page">
+
+            <div class="empty-page-icon">
+                <i class="bi bi-calendar-event"></i>
+            </div>
+
+            <h3>
+                No exams yet
+            </h3>
+
+            <p>
+                Add your subjects and exam dates to start planning.
+            </p>
+
+            <a
+                href="{{ url_for('add_subject') }}"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-plus-lg"></i>
+                Add Subject
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ======================================
+     TASK PROGRESS
+====================================== -->
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h3>
+                Task Completion
+            </h3>
+
+            <p>
+                Your overall task progress.
+            </p>
+
+        </div>
+
+        <strong>
+            {{ completion_percentage }}%
+        </strong>
+
+    </div>
+
+
+    <div class="progress-container">
+
+        <div class="progress-label">
+
+            <span>
+                Progress
+            </span>
+
+            <span>
+                {{ completed_tasks }} / {{ total_tasks }}
+            </span>
+
+        </div>
+
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                data-completion="{{ completion_percentage }}"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="progress-label" style="margin-top: 12px; margin-bottom: 0;">
+
+        <span>
+            {{ completed_tasks }} completed
+        </span>
+
+        <span>
+            {{ pending_tasks }} pending
+        </span>
+
+    </div>
+
+</div>
+
+<script>
+    document.querySelectorAll('.progress-bar[data-completion]').forEach(function (bar) {
+        bar.style.width = (Number(bar.dataset.completion) || 0) + '%';
+    });
+</script>
+
+{% endblock %}

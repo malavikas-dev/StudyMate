@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Study Plan | StudyMate{% endblock %}
+
+{% block page_title %}Study Plan 📚{% endblock %}
+
+{% block page_subtitle %}
+A personalized plan based on your exams and study targets.
+{% endblock %}
+
+{% block content %}
+
+{% if plans %}
+
+<div class="plan-grid">
+
+    {% for plan in plans %}
+
+    <div class="plan-card">
+
+        <div class="plan-card-top">
+
+            <div class="plan-icon">
+                <i class="bi bi-book-fill"></i>
+            </div>
+
+            {% if plan.days_left < 0 %}
+
+                <span class="plan-badge completed">
+                    Exam Completed
+                </span>
+
+            {% elif plan.days_left == 0 %}
+
+                <span class="plan-badge urgent">
+                    Exam Today
+                </span>
+
+            {% elif plan.days_left <= 7 %}
+
+                <span class="plan-badge urgent">
+                    {{ plan.days_left }} days left
+                </span>
+
+            {% else %}
+
+                <span class="plan-badge">
+                    {{ plan.days_left }} days left
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <h3>{{ plan.name }}</h3>
+
+
+        <div class="plan-info">
+
+            <div>
+                <i class="bi bi-calendar-event"></i>
+                <span>Exam: {{ plan.exam_date }}</span>
+            </div>
+
+            <div>
+                <i class="bi bi-bullseye"></i>
+                <span>
+                    Target: {{ "%.1f"|format(plan.target_hours) }} hours
+                </span>
+            </div>
+
+            <div>
+                <i class="bi bi-clock"></i>
+                <span>
+                    {{ "%.2f"|format(plan.daily_hours) }} hrs/day recommended
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="plan-progress-section">
+
+            <div class="plan-progress-header">
+                <span>Study Progress</span>
+                <strong>{{ plan.progress }}%</strong>
+            </div>
+
+            <div class="plan-progress-track">
+
+                <div
+    class="plan-progress-bar"
+    data-width="{{ plan.progress }}">
+</div>
+
+            </div>
+
+            <div class="plan-progress-footer">
+
+                <span>
+                    {{ "%.2f"|format(plan.studied_hours) }}h studied
+                </span>
+
+                <span>
+                    {{ "%.2f"|format(plan.remaining_hours) }}h remaining
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('timer') }}"
+            class="plan-action"
+        >
+            <i class="bi bi-stopwatch"></i>
+            Study Now
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+
+{% else %}
+
+<div class="empty-page">
+
+    <div class="empty-page-icon">
+        <i class="bi bi-calendar2-week"></i>
+    </div>
+
+    <h3>No study plan yet</h3>
+
+    <p>
+        Add subjects and exam dates to generate your study plan.
+    </p>
+
+    <a
+        href="{{ url_for('add_subject') }}"
+        class="btn btn-primary"
+    >
+        <i class="bi bi-plus-lg"></i>
+        Add Subject
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

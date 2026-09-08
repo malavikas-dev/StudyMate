@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Study History | StudyMate{% endblock %}
+
+{% block page_title %}Study History 📚{% endblock %}
+
+{% block page_subtitle %}
+See how much time you've invested in your studies.
+{% endblock %}
+
+{% block content %}
+
+<div class="history-summary">
+
+    <div class="history-summary-icon">
+        <i class="bi bi-clock-history"></i>
+    </div>
+
+    <div>
+        <span>Total Study Time</span>
+
+        <h2>
+            {% if total_hours < 1 %}
+                {{ (total_hours * 60)|round(0)|int }} min
+            {% else %}
+                {{ "%.2f"|format(total_hours) }} h
+            {% endif %}
+        </h2>
+    </div>
+
+</div>
+
+
+<div class="panel history-panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h3>Study Sessions</h3>
+
+            <p>
+                Your completed study sessions.
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('timer') }}"
+            class="btn btn-primary"
+        >
+            <i class="bi bi-stopwatch"></i>
+            Start Studying
+        </a>
+
+    </div>
+
+
+    {% if sessions %}
+
+        <div class="history-list">
+
+            {% for session in sessions %}
+
+            <div class="history-item">
+
+                <div class="history-item-icon">
+                    <i class="bi bi-book-fill"></i>
+                </div>
+
+
+                <div class="history-item-info">
+
+                    <strong>
+                        {{ session.subject_name }}
+                    </strong>
+
+                    <span>
+                        <i class="bi bi-calendar3"></i>
+                        {{ session.date }}
+                    </span>
+
+                </div>
+
+
+                <div class="history-duration">
+
+                    {% if session.duration < 1 %}
+
+                        {{ (session.duration * 60)|round(0)|int }} min
+
+                    {% else %}
+
+                        {{ "%.2f"|format(session.duration) }} h
+
+                    {% endif %}
+
+                </div>
+
+
+                <a
+                    href="{{ url_for('delete_session', session_id=session.id) }}"
+                    class="history-delete"
+                    onclick="return confirm('Delete this study session?');"
+                    title="Delete session"
+                >
+                    <i class="bi bi-trash"></i>
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-page">
+
+            <div class="empty-page-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+
+            <h3>
+                No study sessions yet
+            </h3>
+
+            <p>
+                Start a study timer and your completed sessions
+                will appear here.
+            </p>
+
+            <a
+                href="{{ url_for('timer') }}"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-stopwatch"></i>
+                Start Studying
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

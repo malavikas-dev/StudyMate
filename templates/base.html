@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}StudyMate{% endblock %}</title>
+
+
+    <!-- ========================= -->
+    <!-- BOOTSTRAP -->
+    <!-- ========================= -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- ========================= -->
+    <!-- BOOTSTRAP ICONS -->
+    <!-- ========================= -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+
+    <!-- ========================= -->
+    <!-- GOOGLE FONT -->
+    <!-- ========================= -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- ========================= -->
+    <!-- STUDYMATE CSS -->
+    <!-- ========================= -->
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app-container">
+
+
+    <!-- ========================= -->
+    <!-- SIDEBAR -->
+    <!-- ========================= -->
+
+    <aside class="sidebar">
+
+
+        <!-- LOGO -->
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+
+            <span>StudyMate</span>
+
+        </div>
+
+
+        <!-- MENU TITLE -->
+
+        <div class="menu-title">
+            MENU
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- MAIN MENU -->
+        <!-- ========================= -->
+
+        <nav class="sidebar-menu">
+
+    <a href="{{ url_for('dashboard') }}"
+       class="menu-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+    </a>
+
+    <a href="{{ url_for('subjects') }}"
+       class="menu-item {% if request.endpoint in ['subjects', 'add_subject', 'edit_subject'] %}active{% endif %}">
+        <i class="bi bi-book-fill"></i>
+        <span>Subjects</span>
+    </a>
+
+    <a href="{{ url_for('tasks') }}"
+       class="menu-item {% if request.endpoint in ['tasks', 'add_task', 'complete_task'] %}active{% endif %}">
+        <i class="bi bi-check2-square"></i>
+        <span>Tasks</span>
+    </a>
+
+    <a href="{{ url_for('timer') }}"
+       class="menu-item {% if request.endpoint == 'timer' %}active{% endif %}">
+        <i class="bi bi-stopwatch"></i>
+        <span>Study Timer</span>
+    </a>
+
+    <a href="{{ url_for('sessions') }}"
+       class="menu-item {% if request.endpoint in ['sessions', 'delete_session'] %}active{% endif %}">
+        <i class="bi bi-clock-history"></i>
+        <span>Study History</span>
+    </a>
+
+    <a href="{{ url_for('analytics') }}"
+       class="menu-item {% if request.endpoint == 'analytics' %}active{% endif %}">
+        <i class="bi bi-bar-chart-fill"></i>
+        <span>Analytics</span>
+    </a>
+
+    <a href="{{ url_for('study_plan') }}"
+       class="menu-item {% if request.endpoint == 'study_plan' %}active{% endif %}">
+        <i class="bi bi-calendar3"></i>
+        <span>Study Plan</span>
+    </a>
+
+</nav>
+
+
+        <!-- ========================= -->
+        <!-- SIDEBAR BOTTOM -->
+        <!-- ========================= -->
+
+        <div class="sidebar-bottom">
+
+    <div class="menu-title">
+        TOOLS
+    </div>
+
+    <a href="{{ url_for('pomodoro') }}"
+       class="menu-item {% if request.endpoint in ['pomodoro', 'save_pomodoro'] %}active{% endif %}">
+        <i class="bi bi-stopwatch-fill"></i>
+        <span>Pomodoro</span>
+    </a>
+
+    <a href="{{ url_for('settings') }}"
+       class="menu-item {% if request.endpoint == 'settings' %}active{% endif %}">
+        <i class="bi bi-gear-fill"></i>
+        <span>Settings</span>
+    </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ========================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ========================= -->
+
+    <main class="main-content">
+
+
+        <!-- ========================= -->
+        <!-- TOP BAR -->
+        <!-- ========================= -->
+
+        <header class="topbar">
+
+
+            <!-- PAGE TITLE -->
+
+            <div>
+
+                <h1>
+
+                    {% block page_title %}
+                    Dashboard
+                    {% endblock %}
+
+                </h1>
+
+
+                <p>
+
+                    {% block page_subtitle %}
+                    Plan smarter. Study better.
+                    {% endblock %}
+
+                </p>
+
+            </div>
+
+
+
+            <!-- ========================= -->
+            <!-- TOPBAR ACTIONS -->
+            <!-- ========================= -->
+
+            <div class="topbar-actions">
+
+
+                <!-- THEME BUTTON -->
+
+                <button
+                    class="icon-button"
+                    onclick="toggleTheme()"
+                    title="Toggle theme"
+                >
+
+                    <i class="bi bi-moon-fill"></i>
+
+                </button>
+
+
+
+                <!-- NOTIFICATION -->
+
+                <div class="notification-wrapper">
+
+    <button
+        class="icon-button notification-button"
+        onclick="toggleNotifications()"
+        title="Notifications"
+    >
+        <i class="bi bi-bell-fill"></i>
+
+        {% if notifications %}
+        <span class="notification-badge">
+            {{ notifications|length }}
+        </span>
+        {% endif %}
+    </button>
+
+    <div class="notification-panel" id="notificationPanel">
+
+        <div class="notification-header">
+            <strong>Notifications</strong>
+        </div>
+
+        {% if notifications %}
+
+            {% for notification in notifications %}
+
+            <div class="notification-item">
+
+                <div class="notification-icon">
+                    <i class="bi bi-bell-fill"></i>
+                </div>
+
+                <div>
+                    <strong>{{ notification.title }}</strong>
+                    <p>{{ notification.message }}</p>
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="notification-empty">
+                <i class="bi bi-bell-slash"></i>
+                <p>No notifications</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+
+                <!-- PROFILE -->
+
+                <div class="profile">
+
+
+                    <div class="profile-avatar">
+
+                        <i class="bi bi-person-fill"></i>
+
+                    </div>
+
+
+                    <div class="profile-info">
+
+                        <strong>
+                            Student
+                        </strong>
+
+                        <span>
+                            Study Mode
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- ========================= -->
+        <!-- PAGE CONTENT -->
+        <!-- ========================= -->
+
+        <div class="content">
+
+    {% block content %}
+    {% endblock %}
+
+</div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- STUDYMATE JAVASCRIPT -->
+<!-- ========================= -->
+
+<script
+    src="{{ url_for('static', filename='js/main.js') }}"
+></script>
+
+
+</body>
+
+</html>

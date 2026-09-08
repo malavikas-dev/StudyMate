@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block title %}Pomodoro | StudyMate{% endblock %}
+
+{% block page_title %}Pomodoro Focus 🍅{% endblock %}
+
+{% block page_subtitle %}
+Focus deeply, take meaningful breaks, and make your study time count.
+{% endblock %}
+
+{% block content %}
+
+<div class="pomodoro-page">
+
+    <div class="pomodoro-card">
+
+        <div class="pomodoro-icon">
+            <i class="bi bi-stopwatch-fill"></i>
+        </div>
+
+        <div id="pomodoro-mode" class="pomodoro-mode">
+            Focus Session
+        </div>
+
+        <div id="pomodoro-display" class="pomodoro-display">
+            25:00
+        </div>
+
+        <div class="pomodoro-status" id="pomodoro-status">
+            Ready to focus?
+        </div>
+
+
+        <div class="pomodoro-subject">
+
+            <label for="pomodoro-subject">
+                What are you studying?
+            </label>
+
+            <select id="pomodoro-subject">
+
+                <option value="">
+                    Select a subject
+                </option>
+
+                {% for subject in subjects %}
+
+                <option value="{{ subject.id }}">
+                    {{ subject.name }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="pomodoro-buttons">
+
+            <button
+                id="pomodoro-start"
+                class="btn btn-primary"
+                onclick="startPomodoro()"
+            >
+                <i class="bi bi-play-fill"></i>
+                Start
+            </button>
+
+            <button
+                id="pomodoro-pause"
+                class="pomodoro-secondary"
+                onclick="pausePomodoro()"
+            >
+                <i class="bi bi-pause-fill"></i>
+                Pause
+            </button>
+
+            <button
+                class="pomodoro-reset"
+                onclick="resetPomodoro()"
+            >
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Reset
+            </button>
+
+        </div>
+
+
+        <div class="pomodoro-progress">
+
+            <div class="pomodoro-progress-track">
+
+                <div
+                    id="pomodoro-progress-bar"
+                    class="pomodoro-progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="pomodoro-sessions">
+
+            <span>Completed focus sessions</span>
+
+            <strong id="session-count">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="pomodoro-info">
+
+            <div>
+                <i class="bi bi-lightning-charge-fill"></i>
+
+                <span>
+                    25 min focus
+                </span>
+            </div>
+
+            <div>
+                <i class="bi bi-cup-hot-fill"></i>
+
+                <span>
+                    5 min break
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let focusDuration = 25 * 60;
+let breakDuration = 5 * 60;
+
+let timeLeft = focusDuration;
+
+let timer = null;
+let isRunning = false;
+let isFocus = true;
+
+let completedSessions = 0;
+
+
+function updateDisplay() {
+
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+
+    document.getElementById("pomodoro-display")
+        .textContent =
+        String(minutes).padStart(2, "0")
+        + ":"
+        + String(seconds).padStart(2, "0");
+
+
+    const totalTime =
+        isFocus ? focusDuration : breakDuration;
+
+    const progress =
+        ((totalTime - timeLeft) / totalTime) * 100;
+
+    document.getElementById("pomodoro-progress-bar")
+        .style.width = progress + "%";
+}
+
+
+function startPomodoro() {
+
+    if (isRunning) {
+        return;
+    }
+
+
+    if (isFocus) {
+
+        const subject =
+            document.getElementById("pomodoro-subject").value;
+
+        if (!subject) {
+
+            alert("Please select a subject first.");
+
+            return;
+        }
+    }
+
+
+    isRunning = true;
+
+    document.getElementById("pomodoro-status")
+        .textContent =
+        isFocus
+            ? "Stay focused. You've got this! 💪"
+            : "Take a break and recharge. ☕";
+
+
+    timer = setInterval(function () {
+
+        timeLeft--;
+
+        updateDisplay();
+
+
+        if (timeLeft <= 0) {
+
+            clearInterval(timer);
+
+            timer = null;
+
+            isRunning = false;
+
+            finishPomodoro();
+
+        }
+
+    }, 1000);
+}
+
+
+function pausePomodoro() {
+
+    if (!isRunning) {
+        return;
+    }
+
+    clearInterval(timer);
+
+    timer = null;
+
+    isRunning = false;
+
+    document.getElementById("pomodoro-status")
+        .textContent =
+        "Paused. Resume whenever you're ready.";
+}
+
+
+function resetPomodoro() {
+
+    clearInterval(timer);
+
+    timer = null;
+
+    isRunning = false;
+
+    isFocus = true;
+
+    timeLeft = focusDuration;
+
+    document.getElementById("pomodoro-mode")
+        .textContent = "Focus Session";
+
+    document.getElementById("pomodoro-status")
+        .textContent = "Ready to focus?";
+
+    updateDisplay();
+}
+
+
+function finishPomodoro() {
+
+    if (isFocus) {
+
+        completedSessions++;
+
+        document.getElementById("session-count")
+            .textContent = completedSessions;
+
+
+        saveFocusSession();
+
+
+        alert(
+            "Focus session completed! 🎉\n\n"
+            + "Time for a 5-minute break."
+        );
+
+
+        isFocus = false;
+
+        timeLeft = breakDuration;
+
+        document.getElementById("pomodoro-mode")
+            .textContent = "Break Time ☕";
+
+        document.getElementById("pomodoro-status")
+            .textContent =
+            "Take a break and recharge.";
+
+    } else {
+
+        alert(
+            "Break finished! 🚀\n\n"
+            + "Ready for another focus session?"
+        );
+
+
+        isFocus = true;
+
+        timeLeft = focusDuration;
+
+        document.getElementById("pomodoro-mode")
+            .textContent = "Focus Session";
+
+        document.getElementById("pomodoro-status")
+            .textContent =
+            "Ready for another round?";
+
+    }
+
+    updateDisplay();
+}
+
+
+function saveFocusSession() {
+
+    const subject =
+        document.getElementById("pomodoro-subject").value;
+
+    if (!subject) {
+        return;
+    }
+
+
+    const form =
+        document.createElement("form");
+
+    form.method = "POST";
+
+    form.action =
+        "{{ url_for('save_pomodoro') }}";
+
+
+    const subjectInput =
+        document.createElement("input");
+
+    subjectInput.type = "hidden";
+
+    subjectInput.name = "subject_id";
+
+    subjectInput.value = subject;
+
+
+    const durationInput =
+        document.createElement("input");
+
+    durationInput.type = "hidden";
+
+    durationInput.name = "duration";
+
+    durationInput.value = "0.4166666667";
+
+
+    form.appendChild(subjectInput);
+
+    form.appendChild(durationInput);
+
+    document.body.appendChild(form);
+
+    form.submit();
+}
+
+
+updateDisplay();
+
+</script>
+
+{% endblock %}

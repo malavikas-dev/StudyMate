@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics | StudyMate{% endblock %}
+
+{% block page_title %}Study Analytics 📊{% endblock %}
+
+{% block page_subtitle %}
+Understand your study habits and track your progress.
+{% endblock %}
+
+{% block content %}
+
+<div class="analytics-stats">
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-clock-fill"></i>
+        </div>
+
+        <div>
+            <p>Total Study Hours</p>
+            <h2>{{ "%.1f"|format(total_hours) }}</h2>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-stopwatch-fill"></i>
+        </div>
+
+        <div>
+            <p>Study Sessions</p>
+            <h2>{{ total_sessions }}</h2>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-graph-up"></i>
+        </div>
+
+        <div>
+            <p>Average Session</p>
+            <h2>{{ "%.2f"|format(average_session) }}h</h2>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="analytics-grid">
+
+    <!-- Subject Statistics -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+            <div>
+                <h3>Study Time by Subject</h3>
+                <p>See where you're spending your study time.</p>
+            </div>
+        </div>
+
+        {% if subject_stats %}
+
+            <div class="analytics-list">
+
+                {% for subject in subject_stats %}
+
+                <div class="analytics-item">
+
+                    <div class="analytics-item-info">
+
+                        <strong>
+                            {{ subject.subject_name }}
+                        </strong>
+
+                        <span>
+                            {{ "%.2f"|format(subject.hours) }} hours
+                        </span>
+
+                    </div>
+
+                    <div class="analytics-progress">
+
+                        <div
+    class="analytics-progress-bar"
+    data-width="{% if total_hours > 0 %}{{ (subject.hours / total_hours * 100)|round(0) }}{% else %}0{% endif %}">
+</div>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <i class="bi bi-bar-chart"></i>
+
+                <h3>No analytics yet</h3>
+
+                <p>
+                    Complete some study sessions to see your statistics.
+                </p>
+
+                <a
+                    href="{{ url_for('timer') }}"
+                    class="btn btn-primary">
+                    Start Studying
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Weekly Activity -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <div>
+                <h3>Last 7 Days</h3>
+                <p>Your recent study activity.</p>
+            </div>
+
+        </div>
+
+
+        {% if weekly_stats %}
+
+            <div class="weekly-list">
+
+                {% for day in weekly_stats %}
+
+                <div class="weekly-item">
+
+                    <span class="weekly-date">
+                        {{ day.date }}
+                    </span>
+
+                    <div class="weekly-bar-container">
+
+                        <div
+    class="weekly-bar"
+    data-width="{% if total_hours > 0 %}{{ (day.hours / total_hours * 100)|round(0) }}{% else %}0{% endif %}">
+</div>
+
+                    </div>
+
+                    <strong>
+                        {{ "%.2f"|format(day.hours) }}h
+                    </strong>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <i class="bi bi-calendar-week"></i>
+
+                <p>
+                    No study activity recorded yet.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
